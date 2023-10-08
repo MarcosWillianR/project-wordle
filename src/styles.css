@@ -230,3 +230,10 @@ h1 {
     transform: translateY(0%);
   }
 }
+
+
+.restart-game-btn {
+  margin-top: 1rem;
+  padding: .875rem;
+  background-color: blue;
+}
