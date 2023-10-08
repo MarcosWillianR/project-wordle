@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { sample } from '../../utils';
+import { NUM_OF_GUESSES_ALLOWED } from '../../constants';
 import { WORDS } from '../../data';
 
 import GuessInput from '../GuessInput';
@@ -12,15 +13,37 @@ const answer = sample(WORDS);
 console.info({ answer });
 
 function Game() {
-  const [guessList, setGuessList] = React.useState([])
+  const [currentPosition, setCurrentPosition] = React.useState(0)
+  const [guessList, setGuessList] = React.useState([
+    { id: crypto.randomUUID(), value: '' },
+    { id: crypto.randomUUID(), value: '' },
+    { id: crypto.randomUUID(), value: '' },
+    { id: crypto.randomUUID(), value: '' },
+    { id: crypto.randomUUID(), value: '' },
+    { id: crypto.randomUUID(), value: '' },
+  ])
+
+  function handleNewGuess(guess) {
+    if ((currentPosition + 1) > NUM_OF_GUESSES_ALLOWED) {
+      return
+    }
+
+    setGuessList(state => state.map((currentGuess, index) => {
+      if (currentPosition === index) {
+        return guess
+      }
+
+      return currentGuess
+    }))
+
+    setCurrentPosition(state => state + 1)
+  }
 
   return (
     <>
       <Guesses guessList={guessList} />
 
-      <GuessInput 
-        onGuess={guess => setGuessList(state => [...state, guess])} 
-      />
+      <GuessInput onGuess={guess => handleNewGuess(guess)} />
     </>
   )
 }
