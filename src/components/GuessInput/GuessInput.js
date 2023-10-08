@@ -1,17 +1,17 @@
 import React from 'react'
 
-function GuessInput({ onGuess, isEndgame }) {
-  const [guessValue, setGuessValue] = React.useState('')
+function GuessInput({ handleSubmitGuess, gameStatus }) {
+  const [tentativeGuess, setTentativeGuess] = React.useState('')
 
   return (
     <form 
       onSubmit={event => {
         event.preventDefault()
-        onGuess({
+        handleSubmitGuess({
           id: crypto.randomUUID(),
-          value: guessValue
+          value: tentativeGuess
         })
-        setGuessValue('')
+        setTentativeGuess('')
       }} 
       className="guess-input-wrapper"
     >
@@ -19,11 +19,11 @@ function GuessInput({ onGuess, isEndgame }) {
       <input 
         id="guess-input" 
         type="text"
-        value={guessValue}
+        value={tentativeGuess}
         pattern="[a-zA-Z]{5}"
         title="5 letter word"
-        disabled={isEndgame}
-        onChange={e => setGuessValue(e.target.value.toUpperCase())}
+        disabled={gameStatus !== 'running'}
+        onChange={e => setTentativeGuess(e.target.value.toUpperCase())}
       />
     </form>
   )

@@ -3,29 +3,46 @@ import React from 'react';
 import { range } from '../../utils'
 import { checkGuess } from '../../game-helpers'
 
-function Guess({ guess, answer }) {
+function Cell({ letter, status }) {
+  const className = status ? `cell ${status}` : 'cell';
+  return (
+    <span className={className}>
+      {letter}
+    </span>
+  )
+}
+
+function Guess({ data, answer }) {
   const guessRange = range(0, 5)
-  const guessLettersChecked = checkGuess(guess.value, answer)
+  const guessLettersChecked = checkGuess(data.value, answer)
 
   return (
     <p className="guess">
       {guessRange.map(guessRangeIndex => {
-        if (guess.value) {
+        if (data.value) {
+          const sameLetter = (letter) => letter === data.value[guessRangeIndex]
+          const sameLetterIndex = (letterIndex) => letterIndex === guessRangeIndex 
           const currentLetter = 
-            guessLettersChecked.find(({ letter }, lettersCheckedIndex) => 
-              letter === guess.value[guessRangeIndex] && 
-              guessRangeIndex === lettersCheckedIndex
+            guessLettersChecked.find(({ letter }, letterCheckedIndex) => 
+              sameLetter(letter) && 
+              sameLetterIndex(letterCheckedIndex)
             )
           
           return (
-            <span key={guessRangeIndex} className={`cell ${currentLetter.status}`}>
-              {guess.value[guessRangeIndex]}
-            </span>
+            <Cell 
+              key={guessRangeIndex} 
+              letter={data.value[guessRangeIndex]}
+              status={currentLetter.status}
+            />
           )
         }
 
         return (
-          <span key={guessRangeIndex} className="cell"></span>
+          <Cell 
+            key={guessRangeIndex} 
+            letter={undefined}
+            status={undefined}
+          />
         )
       })}
     </p>

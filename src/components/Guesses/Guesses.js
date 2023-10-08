@@ -5,9 +5,9 @@ import Guess from '../Guess'
 function Guesses({ guessList, answer }) {
   return (
     <div className="guess-results">
-      {guessList.map((guess) => {
+      {guessList.map((data) => {
         return (
-          <Guess key={guess.id} guess={guess} answer={answer} />
+          <Guess key={data.id} data={data} answer={answer} />
         )
       })}
     </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { sample } from '../../utils';
+import { NUM_OF_GUESSES_ALLOWED } from '../../constants';
 import { WORDS } from '../../data';
 
 import GuessInput from '../GuessInput';
@@ -19,8 +20,7 @@ const defaultGuessList = [
 function Game() {
   const [answer, setAnswer] = React.useState(sample(WORDS))
   const [currentGuessesAmount, setCurrentGuessesAmount] = React.useState(0)
-  const [isWinner, setIsWinner] = React.useState(false)
-  const [isEndgame, setIsEndgame] = React.useState(false)
+  const [gameStatus, setGameStatus] = React.useState('running') // running, won, lost
   const [guessList, setGuessList] = React.useState(defaultGuessList)
 
   console.log({ answer })
@@ -28,29 +28,22 @@ function Game() {
   function handleRestartGame() {
     setAnswer(sample(WORDS))
     setCurrentGuessesAmount(0)
-    setIsWinner(false)
-    setIsEndgame(false)
+    setGameStatus('running')
     setGuessList(defaultGuessList)
   }
 
-  function handleVerifyEndgame(guess) {
-    if (guess.value === answer) {
-      setIsWinner(true)
-      setIsEndgame(true)
-      return
-    }
-
-    if ((currentGuessesAmount + 1) === 6) {
-      setIsWinner(false)
-      setIsEndgame(true)
-      return
+  function handleVerifyEndgame(tentativeGuess) {
+    if (tentativeGuess.value === answer) {
+      setGameStatus('won')
+    } else if ((currentGuessesAmount + 1) === NUM_OF_GUESSES_ALLOWED) {
+      setGameStatus('lost')
     }
   }
 
-  function handleNewGuess(guess) {
+  function handleNewTentativeGuess(tentativeGuess) {
     setGuessList(state => state.map((currentGuess, index) => {
       if (currentGuessesAmount === index) {
-        return guess
+        return tentativeGuess
       }
 
       return currentGuess
@@ -59,7 +52,7 @@ function Game() {
     const newGuessessAmount = currentGuessesAmount + 1
     setCurrentGuessesAmount(newGuessessAmount)
 
-    handleVerifyEndgame(guess)
+    handleVerifyEndgame(tentativeGuess)
   }
 
   return (
@@ -70,17 +63,27 @@ function Game() {
       />
 
       <GuessInput 
-        onGuess={guess => handleNewGuess(guess)}
-        isEndgame={isEndgame}
+        handleSubmitGuess={tentativeGuess => handleNewTentativeGuess(tentativeGuess)}
+        gameStatus={gameStatus}
       />
 
-      {isEndgame && (
-        <Banner 
-          guesses={currentGuessesAmount}
-          answer={answer} 
-          isWinner={isWinner}
-          onRestartGame={handleRestartGame}
-        />
+      {gameStatus === 'won' && (
+        <Banner status="happy">
+          <p>
+            <strong>Congratulations!</strong> Got it in{' '}
+            <strong>
+              {currentGuessesAmount === 1 ? '1 guess' : `${currentGuessesAmount} guesses`}
+            </strong>.
+          </p>
+          <button className="restart-game-btn" onClick={handleRestartGame}>Restart game</button>
+        </Banner>
+      )}
+
+      {gameStatus === 'lost' && (
+        <Banner status="sad">
+          <p>Sorry, the correct answer is <strong>{answer}</strong>.</p>
+          <button className="restart-game-btn" onClick={handleRestartGame}>Restart game</button>
+        </Banner>
       )}
     </>
   )
